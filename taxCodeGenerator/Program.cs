@@ -500,9 +500,7 @@ public partial class TaxCodeGenerator
             }// End if
 
         // Get the MOD of Sum and 26
-        Console.WriteLine(sumVer);
         sumVer %= 26;
-        Console.WriteLine(sumVer);
 
         for (int i = 0; i < resultTable.Length; i++)
             if ((int)resultTable[i,0] == sumVer) return resultTable[i, 1].ToString();
