@@ -5,7 +5,7 @@ public partial class TaxCodeGenerator
     // Global Var
     static char[] vowelsArr = new char[5] {'A', 'E', 'I', 'O', 'U'};
     static char[] consArr = new char[21] {'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z'};
-    static string vowels, cons, year, month, day, municipal, supControlChar;
+    static string vowels, cons, year, month, day, municipal, supControlChar, controlChar;
     static int genderSum;
     static string mainP = "Enter your last name: ";
     static void Main(string[] args)
@@ -13,20 +13,21 @@ public partial class TaxCodeGenerator
         // Data Model
         string lastName, Name, Year, Month, Day, cadastralCode;
 
-        GetVowelsnCons();
+        GetVowelsnCons(); // Last Name
         lastName = GetLastname();
-        GetVowelsnCons();
+        GetVowelsnCons(); // Name
         Name = GetName();
-        GetBioGender();
-        GetDate();
+        GetBioGender(); // Gender
+        GetDate(); // Date of Birth
         Year = GetYear();
         Month = GetMonth();
         Day = GetDay();
-        GetMunicipal();
+        GetMunicipal(); // Municipal
         cadastralCode = GetCadastralCode();
         supControlChar = lastName + Name + Year + Month + Day + cadastralCode;
-        Console.WriteLine(supControlChar);
-        GetControlChar();
+        controlChar = GetControlChar(); // Control Chat
+        supControlChar += controlChar;
+        Console.WriteLine($"Your Tax Number is: {supControlChar}");
     }
     static void GetVowelsnCons()
     {
@@ -283,26 +284,54 @@ public partial class TaxCodeGenerator
     {
         // Data Model
         bool isNumeric;
+        List<string> listA = new List<string>();
+        List<string> listB = new List<string>();
 
         // Elaboration
         Console.Write("Enter a Common Italian: ");
         municipal = Console.ReadLine();
         isNumeric = int.TryParse(municipal, out int val);
 
-        // Is a Municipal
+        // Is a String
         while (isNumeric)
         {
             Console.Write("Error! Enter a Common Italian: ");
             isNumeric = int.TryParse(municipal, out val);
         }// End while
 
-        // Universal Municipal Format
+        // Universal Municipal Case
         municipal = municipal.ToUpper();
 
+        // Is a Common
+        using (var reader = new StreamReader("cadastralCode.csv"))
+        {
+            while (!reader.EndOfStream)
+            {
+                var line = reader.ReadLine();
+                var values = line.Split(',');
+
+                listA.Add(values[0]);
+                listB.Add(values[1]);
+            }// End while
+
+            // Is a Common
+            while (!listB.Contains(municipal))
+            {
+                Console.WriteLine("Error! Common not valid! Reinsert it: ");
+                municipal = Console.ReadLine();
+                // Universal Municipal Case
+                municipal = municipal.ToUpper();
+            }// End while
+
+            if (listB.Contains(municipal))
+                return;
+
+        }// End Reading CSV
     }// End GetMunicipal
     static string GetCadastralCode() 
     {
         // Data Model
+        bool isNumeric;
         List<string> listA = new List<string>();
         List<string> listB = new List<string>();
         
@@ -313,24 +342,22 @@ public partial class TaxCodeGenerator
             while (!reader.EndOfStream)
             {
                 var line = reader.ReadLine();
-                var values = line.Split(';');
+                var values = line.Split(',');
 
                 listA.Add(values[0]);
                 listB.Add(values[1]);
             }// End while
 
             for (int i = 0; i < listA.Count; i++)
-            {
                 if (municipal == listB[i]) return listA[i];
-            }// End for
-            return "ErrMsg";
-
+                
         }// End Reading CSV
+        return "ErrMsg";
     }// End CadastrialCode()
     static string GetControlChar()
     {
         // Data Model
-        int sumVer;
+        int sumVer, k;
         string oddChar, evenChar;
         object[,] charToEven = new object[36, 2] {
             {'0', 0 },
@@ -409,9 +436,39 @@ public partial class TaxCodeGenerator
             {'Y', 24 },
             {'Z', 23 },
         };
+        object[,] resultTable = new object[26, 2]
+        {
+            {0, 'A'},
+            {1, 'B'},
+            {2, 'C'},
+            {3, 'D'},
+            {4, 'E'},
+            {5, 'F'},
+            {6, 'G'},
+            {7, 'H'},
+            {8, 'I'},
+            {9, 'J'},
+            {10, 'K'},
+            {11, 'L'},
+            {12, 'M'},
+            {13, 'N'},
+            {14, 'O'},
+            {15, 'P'},
+            {16, 'Q'},
+            {17, 'R'},
+            {18, 'S'},
+            {19, 'T'},
+            {20, 'U'},
+            {21, 'V'},
+            {22, 'W'},
+            {23, 'X'},
+            {24, 'Y'},
+            {25, 'Z'},
+        };
 
         // Allocation
         sumVer = 0;
+        k = 0;
         oddChar = "";
         evenChar = "";
 
@@ -424,14 +481,31 @@ public partial class TaxCodeGenerator
 
         // Sum for the Verification
         for (int i = 0; i < charToEven.Length; i++)
-            if (charToEven[i, 0] == evenChar) sumVer += Convert.ToInt32(charToEven[i, 1]);
-        
-        for (int i = 0; i < charToOdd.Length; i++)
-            if (charToOdd[i, 0] == oddChar) sumVer += Convert.ToInt32(charToOdd[i, 1]);
+            if (Convert.ToChar(charToEven[i, 0]) == evenChar[k])
+            {
+                sumVer += Convert.ToInt32(charToEven[i, 1]);
+                if (k < evenChar.Length - 1) k++;
+                else break;
+                i = -1;
+            }// End if
 
-        Console.WriteLine(evenChar);
-        Console.WriteLine(oddChar);
+        k = 0;
+        for (int i = 0; i < charToOdd.Length; i++)
+            if (Convert.ToChar(charToOdd[i, 0]) == oddChar[k])
+            {
+                sumVer += Convert.ToInt32(charToOdd[i, 1]);
+                if (k < oddChar.Length - 1) k++;
+                else break;
+                i = -1;
+            }// End if
+
+        // Get the MOD of Sum and 26
         Console.WriteLine(sumVer);
+        sumVer %= 26;
+        Console.WriteLine(sumVer);
+
+        for (int i = 0; i < resultTable.Length; i++)
+            if ((int)resultTable[i,0] == sumVer) return resultTable[i, 1].ToString();
 
         return "ErrMsg";
 
