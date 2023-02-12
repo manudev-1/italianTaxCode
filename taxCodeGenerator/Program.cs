@@ -290,7 +290,7 @@ public partial class TaxCodeGenerator
         // Elaboration
         Console.Write("Enter a Common Italian: ");
         municipal = Console.ReadLine();
-        isNumeric = int.TryParse(municipal, out int val);
+        isNumeric = float.TryParse(municipal, out int val);
 
         // Is a String
         while (isNumeric)
