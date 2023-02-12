@@ -44,12 +44,12 @@ public partial class TaxCodeGenerator
 
         // Get and Verify Surname
         obj = Console.ReadLine();
-        isNumeric = int.TryParse(obj, out int value);
+        isNumeric = float.TryParse(obj, out float value);
         while (isNumeric)
         {
             Console.Write($"Error! {mainP}");
             obj = Console.ReadLine();
-            isNumeric = int.TryParse(obj, out value);
+            isNumeric = float.TryParse(obj, out value);
         }// End While
 
         // Convert lastname toUpper
