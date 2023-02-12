@@ -296,7 +296,7 @@ public partial class TaxCodeGenerator
         while (isNumeric)
         {
             Console.Write("Error! Enter a Common Italian: ");
-            isNumeric = int.TryParse(municipal, out val);
+            isNumeric = float.TryParse(municipal, out val);
         }// End while
 
         // Universal Municipal Case
