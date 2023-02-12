@@ -331,7 +331,6 @@ public partial class TaxCodeGenerator
     static string GetCadastralCode() 
     {
         // Data Model
-        bool isNumeric;
         List<string> listA = new List<string>();
         List<string> listB = new List<string>();
         
